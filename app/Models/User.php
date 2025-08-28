@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'img_server',
+        'vip_expired_at',
     ];
 
     /**
@@ -42,7 +45,38 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'vip_expired_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's collections.
+     */
+    public function collections()
+    {
+        return $this->hasMany(Collection::class);
+    }
+
+    /**
+     * Get the user's payment orders.
+     */
+    public function paymentOrders()
+    {
+        return $this->hasMany(PaymentOrder::class);
+    }
+
+    /**
+     * Check if user has active VIP status
+     */
+    public function hasActiveVip()
+    {
+        // If vip_expired_at is null, user is not VIP
+        if (!$this->vip_expired_at) {
+            return false;
+        }
+
+        // Check if VIP hasn't expired
+        return now()->lt($this->vip_expired_at);
     }
 }
