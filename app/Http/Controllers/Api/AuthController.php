@@ -27,10 +27,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::login($user);
+        // Create token for the user (default 7 days)
+        $token = $user->createToken('auth-token', ['*'], now()->addDays(7));
 
         return response()->json([
             'user' => $user,
+            'token' => $token->plainTextToken,
+            'expires_at' => $token->accessToken->expires_at,
             'message' => 'Registration successful',
         ], 201);
     }
@@ -40,28 +43,45 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'remember' => 'boolean'
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        $request->session()->regenerate();
+        // Delete existing tokens for this user (optional - for single device login)
+        // $user->tokens()->delete();
+
+        // Create token with different expiration based on "remember me"
+        $remember = $request->input('remember', false);
+        
+        if ($remember) {
+            // Remember me: 30 days
+            $token = $user->createToken('auth-token', ['*'], now()->addDays(30));
+        } else {
+            // Normal: 7 days
+            $token = $user->createToken('auth-token', ['*'], now()->addDays(7));
+        }
 
         return response()->json([
-            'user' => Auth::user(),
+            'user' => $user,
+            'token' => $token->plainTextToken,
+            'expires_at' => $token->accessToken->expires_at,
             'message' => 'Login successful',
         ]);
     }
 
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-        
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Revoke the current user's token
+        if ($request->user()) {
+            $request->user()->currentAccessToken()->delete();
+        }
 
         return response()->json(['message' => 'Logged out successfully']);
     }

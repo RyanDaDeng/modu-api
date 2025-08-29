@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Cache;
 class RandomComicsController extends Controller
 {
     private $decryptService;
-    
+
     public function __construct()
     {
         $this->decryptService = new DecryptService();
     }
-    
+
     /**
      * Get random 5 comics with details (cached for 3 hours)
      */
@@ -23,22 +23,22 @@ class RandomComicsController extends Controller
     {
         // Create cache key - refreshes every 3 hours to get different random comics
         $cacheKey = 'random_comics:' . floor(time() / 10800); // 10800 seconds = 3 hours
-        
+
         // Try to get cached response (3 hours TTL)
         $cachedResponse = Cache::remember($cacheKey, now()->addHours(3), function () {
             return $this->fetchRandomComics();
         });
-        
+
         if ($cachedResponse['success']) {
             return response()->json($cachedResponse, 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
                 ->header('X-Cache-TTL', '3 hours');
         }
-        
+
         // If cache fetch failed, try direct fetch
         $result = $this->fetchRandomComics();
         return response()->json($result, $result['success'] ? 200 : 500, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
-    
+
     /**
      * Internal method to fetch random comics
      */
@@ -49,10 +49,10 @@ class RandomComicsController extends Controller
             $baseUrl = 'https://www.cdnmhwscc.vip';
             $timestamp = time();
             $tokenData = $this->decryptService->generateToken($timestamp);
-            
+
             // Always use page 1 and randomly select from it
             $page = 1;
-            
+
             // Make request to categories/filter
             $client = new \GuzzleHttp\Client();
             $response = $client->request('GET', $baseUrl . '/categories/filter', [
@@ -73,10 +73,10 @@ class RandomComicsController extends Controller
                 'timeout' => 30,
                 'verify' => false
             ]);
-            
+
             $rawResponse = $response->getBody()->getContents();
             $responseData = json_decode($rawResponse, true);
-            
+
             // Decrypt the list data
             $listData = [];
             if (isset($responseData['data']) && is_string($responseData['data'])) {
@@ -84,7 +84,7 @@ class RandomComicsController extends Controller
             } else {
                 $listData = $responseData['data'] ?? [];
             }
-            
+
             // Check if we have content
             if (!isset($listData['content']) || empty($listData['content'])) {
                 return response()->json([
@@ -92,27 +92,27 @@ class RandomComicsController extends Controller
                     'error' => 'No comics found'
                 ], 404);
             }
-            
+
             // Step 2: Randomly select 5 comics
             $allComics = $listData['content'];
             $comicCount = count($allComics);
-            $selectCount = min(5, $comicCount);
-            
+            $selectCount = min(10, $comicCount);
+
             // Shuffle and pick first 5
             shuffle($allComics);
             $selectedComics = array_slice($allComics, 0, $selectCount);
-            
+
             // Step 3: Get details for each selected comic
             $detailedComics = [];
-            
+
             foreach ($selectedComics as $comic) {
                 $comicId = $comic['id'];
-                
+
                 try {
                     // Get fresh token for each request
                     $detailTimestamp = time();
                     $detailToken = $this->decryptService->generateToken($detailTimestamp);
-                    
+
                     // Request album details
                     $detailResponse = $client->request('GET', $baseUrl . '/album', [
                         'headers' => [
@@ -128,10 +128,10 @@ class RandomComicsController extends Controller
                         'timeout' => 30,
                         'verify' => false
                     ]);
-                    
+
                     $detailRaw = $detailResponse->getBody()->getContents();
                     $detailData = json_decode($detailRaw, true);
-                    
+
                     // Decrypt detail data if needed
                     $comicDetail = [];
                     if (isset($detailData['data']) && is_string($detailData['data'])) {
@@ -139,35 +139,35 @@ class RandomComicsController extends Controller
                     } else {
                         $comicDetail = $detailData['data'] ?? $detailData;
                     }
-                    
+
                     // Remove unnecessary fields from detail
                     unset($comicDetail['series']);
                     unset($comicDetail['series_id']);
                     unset($comicDetail['related_list']);
-                    
+
                     // Add to results
                     $detailedComics[] = [
                         'id' => $comicId,
                         'basic_info' => $comic,
                         'detail' => $comicDetail
                     ];
-                    
+
                 } catch (\Exception $e) {
                     // If one comic fails, continue with others
                     \Log::error('Failed to get comic detail for ID ' . $comicId . ': ' . $e->getMessage());
                     continue;
                 }
-                
+
                 // Small delay to avoid rate limiting
                 usleep(100000); // 100ms delay
             }
-            
+
             return [
                 'success' => true,
                 'count' => count($detailedComics),
                 'comics' => $detailedComics
             ];
-            
+
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -176,7 +176,7 @@ class RandomComicsController extends Controller
             ];
         }
     }
-    
+
     /**
      * Get single comic detail (cached for 3 hours)
      */
@@ -184,21 +184,21 @@ class RandomComicsController extends Controller
     {
         // Create cache key for this specific comic
         $cacheKey = 'comic_detail:' . $id;
-        
+
         // Try to get cached response (3 hours TTL)
         $cachedResponse = Cache::remember($cacheKey, now()->addHours(3), function () use ($id) {
             return $this->fetchComicDetail($id);
         });
-        
+
         if ($cachedResponse['success']) {
             return response()->json($cachedResponse, 200, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
                 ->header('X-Cache-TTL', '3 hours');
         }
-        
+
         // If cache fetch failed, return error
         return response()->json($cachedResponse, 500, [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
-    
+
     /**
      * Internal method to fetch comic detail
      */
@@ -208,7 +208,7 @@ class RandomComicsController extends Controller
             $baseUrl = 'https://www.cdnmhwscc.vip';
             $timestamp = time();
             $tokenData = $this->decryptService->generateToken($timestamp);
-            
+
             $client = new \GuzzleHttp\Client();
             $response = $client->request('GET', $baseUrl . '/album', [
                 'headers' => [
@@ -224,10 +224,10 @@ class RandomComicsController extends Controller
                 'timeout' => 30,
                 'verify' => false
             ]);
-            
+
             $rawResponse = $response->getBody()->getContents();
             $responseData = json_decode($rawResponse, true);
-            
+
             // Decrypt if needed
             $comicDetail = [];
             if (isset($responseData['data']) && is_string($responseData['data'])) {
@@ -235,17 +235,17 @@ class RandomComicsController extends Controller
             } else {
                 $comicDetail = $responseData['data'] ?? $responseData;
             }
-            
+
             // Remove unnecessary fields
             unset($comicDetail['series']);
             unset($comicDetail['series_id']);
             unset($comicDetail['related_list']);
-            
+
             return [
                 'success' => true,
                 'data' => $comicDetail
             ];
-            
+
         } catch (\Exception $e) {
             return [
                 'success' => false,
