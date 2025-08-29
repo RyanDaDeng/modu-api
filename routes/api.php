@@ -8,8 +8,8 @@ use App\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\ImageServerController;
 
 // Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/login', [AuthController::class, 'login']);
 
 // Public comic proxy routes (no auth required)
 Route::get('/latest', [ProxyController::class, 'proxy']);
@@ -52,10 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
     Route::put('/user/password', [AuthController::class, 'changePassword']);
     Route::put('/user/image-server', [ImageServerController::class, 'update']);
-    
+
     // Search requires authentication
     Route::get('/search', [ProxyController::class, 'proxy']);
-    
+
     // Collection routes
     Route::get('/collections', [CollectionController::class, 'index']);
     Route::post('/collections', [CollectionController::class, 'store']);
@@ -63,10 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/collections/check/{comicId}', [CollectionController::class, 'check']);
     Route::delete('/collections/{comicId}', [CollectionController::class, 'destroy']);
     Route::get('/collections/stats', [CollectionController::class, 'stats']);
-    
+
     // VIP order creation (requires auth)
     Route::post('/vip/create-order', [VipController::class, 'createOrder']);
-    
+
     // Recharge history
     Route::get('/recharge-history', [\App\Http\Controllers\Api\RechargeHistoryController::class, 'index']);
 });
