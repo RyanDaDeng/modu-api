@@ -162,10 +162,14 @@ class RandomComicsController extends Controller
                 usleep(100000); // 100ms delay
             }
 
+            // Step 4: Try to fetch hot tags
+            $hotTags = $this->fetchHotTags();
+
             return [
                 'success' => true,
                 'count' => count($detailedComics),
-                'comics' => $detailedComics
+                'comics' => $detailedComics,
+                'hot_tags' => $hotTags
             ];
 
         } catch (\Exception $e) {
@@ -174,6 +178,59 @@ class RandomComicsController extends Controller
                 'error' => 'Failed to fetch random comics',
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    /**
+     * Fetch hot tags from the forum search endpoint
+     */
+    private function fetchHotTags()
+    {
+        try {
+            $baseUrl = 'https://www.cdnmhwscc.vip';
+            $timestamp = time();
+            $tokenData = $this->decryptService->generateToken($timestamp);
+
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('GET', $baseUrl . '/hot_tags', [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'token' => $tokenData['token'],
+                    'tokenparam' => $tokenData['tokenParam'],
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                ],
+                'query' => [
+                    'mode' => 'search'
+                ],
+                'timeout' => 10,
+                'verify' => false
+            ]);
+
+            $rawResponse = $response->getBody()->getContents();
+
+            $responseData = json_decode($rawResponse, true);
+
+            // Decrypt if needed
+            $searchData = [];
+            if (isset($responseData['data']) && is_string($responseData['data'])) {
+                $searchData = $this->decryptService->decryptData($timestamp, $responseData['data']);
+            } else {
+                $searchData = $responseData['data'] ?? $responseData;
+            }
+
+            // Extract hot tags from search data
+            if (is_array($searchData)) {
+                return $searchData;
+            }
+
+            // Return empty array if no tags found
+            return [];
+
+        } catch (\Exception $e) {
+            // Log error but don't fail the whole request
+            \Log::warning('Failed to fetch hot tags: ' . $e->getMessage());
+            return [];
         }
     }
 

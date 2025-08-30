@@ -12,23 +12,30 @@ Route::prefix('auth')->group(function () {
     // 注册：每10分钟最多3次尝试
     Route::post('/register', [AuthController::class, 'register'])
         ->middleware('throttle:3,10');
-    
+
     // 登录：每分钟最多10次尝试
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:10,1');
-    
+
     // 登出不需要限制
     Route::post('/logout', [AuthController::class, 'logout'])
         ->middleware('auth:sanctum');
 });
 
+Route::middleware([])->prefix('webhook')->namespace('App\Http\Controllers\Webhook')->group(function () {
+    Route::get('/receive-mch', 'MchPaymentWebhookWebController@receivePayment')->name('payment.receive-mch');
+});
+
+
 // Public comic proxy routes (no auth required)
+Route::get('/search', [ProxyController::class, 'proxy']);
 Route::get('/latest', [ProxyController::class, 'proxy']);
 Route::get('/promote', [ProxyController::class, 'proxy']);
 Route::get('/album', [ProxyController::class, 'proxy']);
 Route::get('/chapter', [ProxyController::class, 'proxy']);
 Route::get('/forum', [ProxyController::class, 'proxy']);
 Route::get('/hot_tags', [ProxyController::class, 'proxy']);
+Route::get('/hottag', [ProxyController::class, 'proxy']);
 Route::get('/categories', [ProxyController::class, 'proxy']);
 Route::get('/categories/filter', [ProxyController::class, 'proxy']);
 Route::get('/serialization', [ProxyController::class, 'proxy']);

@@ -45,13 +45,13 @@ class VipController extends Controller
                 'save_amount' => 169
             ]
         ];
-        
+
         return response()->json([
             'success' => true,
             'data' => $plans
         ]);
     }
-    
+
     /**
      * Create payment order for VIP purchase
      */
@@ -61,26 +61,26 @@ class VipController extends Controller
             'plan_key' => 'required|in:monthly,quarterly,yearly',
             'payment_method' => 'required|in:alipay,wechat'
         ]);
-        
+
         $productKey = $request->input('plan_key');
         $paymentMethod = $request->input('payment_method');
         $productsList = config('products.products');
         $user = auth()->user();
-        
+
         if (!isset($productsList[$productKey])) {
             return response()->json([
                 'success' => false,
                 'message' => '产品不存在！请联系管理员'
             ], 400);
         }
-        
+
         $product = $productsList[$productKey];
-        
+
         // Get payment product ID based on payment method
-        $productId = $paymentMethod === 'wechat' 
-            ? config('payment.mch.wechat_id') 
+        $productId = $paymentMethod === 'wechat'
+            ? config('payment.mch.wechat_id')
             : config('payment.mch.alipay_id');
-        
+
         // Create payment order
         $paymentOrder = \App\Models\PaymentOrder::create([
             'user_id' => $user->id,
@@ -93,37 +93,37 @@ class VipController extends Controller
             'source' => 1,
             'payment_method' => $paymentMethod
         ]);
-        
+
         $paymentOrder->order_reference = md5('pro_order_' . $paymentOrder->id);
         $paymentOrder->save();
-        
+
         // Call payment gateway
         $client = new \App\Services\PaymentGateway\MchPaymentProvider();
         $ip = filter_var($request->ip(), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? '127.0.0.1' : $request->ip();
-        
+
         $res = $client->callCreate(
             $product['decimal_price'],  // Use decimal_price for payment gateway
             $paymentOrder->order_reference,
-            config('app.url') . '/webhook/receive-mch',
+            config('app.url') . '/api/webhook/receive-mch',
             $ip,
             $productId
         );
-        
+
         if ($res['status'] !== 'success' || $res['data']['code'] != 0 || $res['data']['data']['orderState'] == 7) {
             $paymentOrder->order_notify_response = $res;
             $paymentOrder->save();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => '支付请求失败，请联系管理员。'
             ], 400);
         }
-        
+
         $paymentOrder->order_success_response = $res;
         $paymentOrder->remote_order_status = $res['data']['data']['orderState'];
         $paymentOrder->remote_order_id = $res['data']['data']['payOrderId'];
         $paymentOrder->save();
-        
+
         return response()->json([
             'success' => true,
             'message' => '正在转向支付链接...',

@@ -18,7 +18,7 @@ class ProxyController extends Controller
     ];
 
     private $decryptService;
-    
+
     // Custom encryption key - change this to your own secret
     private $customEncryptionKey = 'MoDu18Comic2024!';
 
@@ -105,7 +105,7 @@ class ProxyController extends Controller
 
             // Encrypt the data with our custom encryption
             $encryptedData = $this->customEncrypt($responseData);
-            
+
             // Only cache successful responses
             if ($response->successful()) {
                 // Cache the encrypted response
@@ -148,7 +148,7 @@ class ProxyController extends Controller
         // Default to first server
         return $this->servers[0];
     }
-    
+
     /**
      * Custom encryption for our data
      */
@@ -156,30 +156,30 @@ class ProxyController extends Controller
     {
         // Convert data to JSON string with UTF-8 encoding
         $jsonData = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        
+
         // Generate key from the key string (matching frontend)
         $key = substr(hash('sha256', $this->customEncryptionKey), 0, 32);
-        
+
         // Convert JSON string to bytes for proper UTF-8 handling
         $dataBytes = unpack('C*', $jsonData);
         $keyBytes = unpack('C*', $key);
-        
+
         // XOR encryption at byte level
         $encrypted = '';
         $keyLen = count($keyBytes);
         $dataLen = count($dataBytes);
-        
+
         for ($i = 1; $i <= $dataLen; $i++) {
             $keyIndex = (($i - 1) % $keyLen) + 1;
             $encrypted .= chr($dataBytes[$i] ^ $keyBytes[$keyIndex]);
         }
-        
+
         // Base64 encode and add a signature
         $result = base64_encode($encrypted);
-        
+
         // Add a hash for integrity check
         $hash = substr(md5($result . $this->customEncryptionKey), 0, 8);
-        
+
         return $hash . '.' . $result;
     }
 }
