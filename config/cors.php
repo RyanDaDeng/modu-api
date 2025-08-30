@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'https://modu18.vip', 'https://18modu.vip', 'https://jm69.vip'],
+    'allowed_origins' => ['http://localhost:5173', 'https://modu18.vip', 'https://18modu.vip', 'https://jm69.vip', 'http://modu.locaL'],
 
     'allowed_origins_patterns' => [],
 

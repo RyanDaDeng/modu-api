@@ -7,9 +7,20 @@ use App\Http\Controllers\Api\CollectionController;
 use App\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\ImageServerController;
 
-// Public routes
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
+// Authentication routes with throttling
+Route::prefix('auth')->group(function () {
+    // 注册：每10分钟最多3次尝试
+    Route::post('/register', [AuthController::class, 'register'])
+        ->middleware('throttle:3,10');
+    
+    // 登录：每分钟最多10次尝试
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:10,1');
+    
+    // 登出不需要限制
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->middleware('auth:sanctum');
+});
 
 // Public comic proxy routes (no auth required)
 Route::get('/latest', [ProxyController::class, 'proxy']);
@@ -48,7 +59,7 @@ Route::prefix('test')->group(function () {
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
     Route::put('/user/password', [AuthController::class, 'changePassword']);
     Route::put('/user/image-server', [ImageServerController::class, 'update']);
