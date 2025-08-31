@@ -26,10 +26,6 @@ Route::prefix('auth')->group(function () {
         ->middleware('auth:sanctum');
 });
 
-Route::middleware([])->prefix('webhook')->namespace('App\Http\Controllers\Webhook')->group(function () {
-    Route::get('/receive-mch', 'MchPaymentWebhookWebController@receivePayment')->name('payment.receive-mch');
-});
-
 
 // Public comic proxy routes (no auth required)
 Route::get('/latest', [ProxyController::class, 'proxy']);
