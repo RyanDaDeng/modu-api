@@ -11,5 +11,5 @@ return [
     |
     */
 
-    'api_key' => env('REDEMPTION_API_KEY', 'your-secret-api-key-here'),
+    'api_key' => env('REDEMPTION_API_KEY', 'XmLhj12vb112&%~!'),
 ];
