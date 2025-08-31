@@ -16,7 +16,7 @@ class VipController extends Controller
             [
                 'key' => 'monthly',
                 'name' => '月卡',
-                'price' => 39,
+                'price' => 29,
                 'duration' => 1,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
@@ -25,24 +25,24 @@ class VipController extends Controller
             [
                 'key' => 'quarterly',
                 'name' => '季卡',
-                'price' => 99,
-                'original_price' => 117,
+                'price' => 69,
+                'original_price' => 90,
                 'duration' => 3,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
                 'popular' => true,
-                'save_amount' => 18
+                'save_amount' => 90 - 69
             ],
             [
                 'key' => 'yearly',
                 'name' => '年卡',
-                'price' => 299,
-                'original_price' => 468,
+                'price' => 239,
+                'original_price' => 360,
                 'duration' => 12,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
                 'popular' => false,
-                'save_amount' => 169
+                'save_amount' => 360 - 239
             ]
         ];
 

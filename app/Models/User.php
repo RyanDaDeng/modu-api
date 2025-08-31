@@ -87,4 +87,22 @@ class User extends Authenticatable
         // Check if VIP hasn't expired
         return now()->lt($this->vip_expired_at);
     }
+
+    /**
+     * Add VIP days to the user
+     */
+    public function addVipDays($days)
+    {
+        if ($this->hasActiveVip()) {
+            // If user already has VIP, extend from current expiry
+            $this->vip_expired_at = $this->vip_expired_at->addDays($days);
+        } else {
+            // If user doesn't have VIP or it's expired, start from now
+            $this->vip_expired_at = now()->addDays($days);
+        }
+        
+        $this->save();
+        
+        return $this->vip_expired_at;
+    }
 }

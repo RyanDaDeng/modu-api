@@ -4,7 +4,7 @@ return [
     'products' => [
         'monthly' => [
             'name' => 'VIP月卡',
-            'price' => 39,
+            'price' => 29,
             'decimal_price' => 3900,  // price * 100 for payment gateway
             'original_price' => 39,
             'value' => 30,
@@ -13,18 +13,18 @@ return [
         ],
         'quarterly' => [
             'name' => 'VIP季卡',
-            'price' => 99,
+            'price' => 69,
             'decimal_price' => 9900,  // price * 100 for payment gateway
-            'original_price' => 117,
+            'original_price' => 99,
             'value' => 90,
             'type' => 'vip',
             'days' => 90
         ],
         'yearly' => [
             'name' => 'VIP年卡',
-            'price' => 299,
+            'price' => 239,
             'decimal_price' => 29900,  // price * 100 for payment gateway
-            'original_price' => 468,
+            'original_price' => 360,
             'value' => 365,
             'type' => 'vip',
             'days' => 365
