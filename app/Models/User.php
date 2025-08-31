@@ -67,6 +67,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's bookmarks.
+     */
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    /**
      * Check if user has active VIP status
      */
     public function hasActiveVip()

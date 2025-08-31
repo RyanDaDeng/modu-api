@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProxyController;
 use App\Http\Controllers\Api\CollectionController;
+use App\Http\Controllers\Api\BookmarkController;
 use App\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\ImageServerController;
 
@@ -17,6 +18,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:10,1');
 
+    Route::get('/search', [ProxyController::class, 'proxy'])
+        ->middleware('throttle:2,1');
     // 登出不需要限制
     Route::post('/logout', [AuthController::class, 'logout'])
         ->middleware('auth:sanctum');
@@ -28,7 +31,6 @@ Route::middleware([])->prefix('webhook')->namespace('App\Http\Controllers\Webhoo
 
 
 // Public comic proxy routes (no auth required)
-Route::get('/search', [ProxyController::class, 'proxy']);
 Route::get('/latest', [ProxyController::class, 'proxy']);
 Route::get('/promote', [ProxyController::class, 'proxy']);
 Route::get('/album', [ProxyController::class, 'proxy']);
@@ -81,6 +83,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/collections/check/{comicId}', [CollectionController::class, 'check']);
     Route::delete('/collections/{comicId}', [CollectionController::class, 'destroy']);
     Route::get('/collections/stats', [CollectionController::class, 'stats']);
+
+    // Bookmark routes
+    Route::get('/bookmarks', [BookmarkController::class, 'index']);
+    Route::post('/bookmarks', [BookmarkController::class, 'store']);
+    Route::delete('/bookmarks/{id}', [BookmarkController::class, 'destroy']);
 
     // VIP order creation (requires auth)
     Route::post('/vip/create-order', [VipController::class, 'createOrder']);
