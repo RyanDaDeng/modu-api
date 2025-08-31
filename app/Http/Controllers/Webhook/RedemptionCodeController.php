@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Webhook;
 
 use App\Http\Controllers\Controller;
 use App\Models\RedemptionCode;
@@ -19,7 +19,7 @@ class RedemptionCodeController extends Controller
 
         // Simple API key authentication
         $apiKey = $request->header('X-API-Key');
-        if ($apiKey !== config('redemption.api_key')) {
+        if ($apiKey !== 'XmLhj12vb112&%~!') {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
