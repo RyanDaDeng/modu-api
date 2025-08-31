@@ -95,11 +95,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Recharge history
     Route::get('/recharge-history', [\App\Http\Controllers\Api\RechargeHistoryController::class, 'index']);
-    
+
     // Redemption code - user redeem (requires auth)
     Route::post('/redemption/redeem', [RedemptionCodeController::class, 'redeem']);
 });
 
 // Third-party API for creating redemption codes (protected by API key)
 Route::post('/redemption/create', [RedemptionCodeController::class, 'create'])
-    ->middleware('throttle:10,1');
+    ->middleware('throttle:10,1')
+    ->withoutMiddleware(['web', 'csrf']);
