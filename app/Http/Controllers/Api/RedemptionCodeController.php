@@ -23,7 +23,7 @@ class RedemptionCodeController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $request->validate([
+        $data = $request->validate([
             'type' => 'required|string|in:vip',
             'value' => 'required|integer|min:1|max:365', // Days for VIP
             'reference' => 'nullable|string|max:255',
@@ -32,10 +32,10 @@ class RedemptionCodeController extends Controller
         DB::beginTransaction();
         try {
             $code = RedemptionCode::create([
-                'code' => RedemptionCode::generateCode(strtoupper($request->type)),
-                'type' => $request->type,
-                'value' => $request->value,
-                'reference' => $request->reference,
+                'code' => RedemptionCode::generateCode(strtoupper($request['type'])),
+                'type' => $data['type'],
+                'value' => $data['value'],
+                'reference' =>$data['reference'],
                 'is_active' => true,
             ]);
             DB::commit();

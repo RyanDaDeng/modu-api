@@ -10,15 +10,7 @@ class RedemptionCode extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'code',
-        'type',
-        'value',
-        'is_active',
-        'reference',
-        'redeemed_by',
-        'redeemed_at',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'is_active' => 'boolean',
@@ -42,7 +34,7 @@ class RedemptionCode extends Model
         do {
             $code = $prefix . '-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4)) . '-' . strtoupper(Str::random(4));
         } while (self::where('code', $code)->exists());
-        
+
         return $code;
     }
 
