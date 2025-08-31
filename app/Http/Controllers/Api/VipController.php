@@ -104,7 +104,7 @@ class VipController extends Controller
         $res = $client->callCreate(
             $product['decimal_price'],  // Use decimal_price for payment gateway
             $paymentOrder->order_reference,
-            config('app.url') . '/api/webhook/receive-mch',
+            config('app.url') . '/webhook/receive-mch',
             $ip,
             $productId
         );
