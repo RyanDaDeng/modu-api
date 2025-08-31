@@ -99,8 +99,3 @@ Route::middleware('auth:sanctum')->group(function () {
     // Redemption code - user redeem (requires auth)
     Route::post('/redemption/redeem', [RedemptionCodeController::class, 'redeem']);
 });
-
-// Third-party API for creating redemption codes (protected by API key)
-Route::post('/redemption/create', [RedemptionCodeController::class, 'create'])
-    ->middleware('throttle:10,1')
-    ->withoutMiddleware(['web', 'csrf']);
