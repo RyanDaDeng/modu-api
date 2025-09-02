@@ -37,10 +37,7 @@ class RedemptionCodeController extends Controller
                     ->count() >= 1;
 
             if ($exists) {
-                return response()->json([
-                    'success' => false,
-                    'message' => '30天内只能兑换最多只能创建1个兑换码'
-                ], 200);
+                return response()->json(['error' => 'Unauthorized'], 401);
             }
         }
 
