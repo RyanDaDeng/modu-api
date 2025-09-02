@@ -27,7 +27,7 @@ class RedemptionCodeController extends Controller
         $data = $request->validate([
             'type' => 'required|string|in:vip',
             'value' => 'required|integer|min:1|max:365', // Days for VIP
-            'reference' => 'nullable|max:255',
+            'reference' => 'nullable',
         ]);
 
         if(isset($data['reference'])){
