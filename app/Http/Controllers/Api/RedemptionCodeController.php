@@ -38,7 +38,7 @@ class RedemptionCodeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => '30天内只能兑换最多只能创建1个兑换码'
-            ], 500);
+            ], 200);
         }
 
         DB::beginTransaction();
