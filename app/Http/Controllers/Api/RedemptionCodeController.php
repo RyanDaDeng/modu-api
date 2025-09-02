@@ -33,7 +33,7 @@ class RedemptionCodeController extends Controller
         if (isset($data['reference'])) {
             $exists = RedemptionCode::query()
                     ->where('reference', $data['reference'])
-                    ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
+//                    ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
                     ->count() >= 1;
 
             if ($exists) {
