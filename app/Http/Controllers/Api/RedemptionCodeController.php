@@ -35,9 +35,15 @@ class RedemptionCodeController extends Controller
                     ->where('reference', $data['reference'])
 //                    ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
                     ->count() >= 1;
-
+            return response()->json([
+                'success' => false,
+                'message' => '30天内只能兑换最多只能创建1个兑换码'
+            ], 200);
             if ($exists) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+                return response()->json([
+                    'success' => false,
+                    'message' => '30天内只能兑换最多只能创建1个兑换码'
+                ], 200);
             }
         }
 
