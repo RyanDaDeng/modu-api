@@ -81,9 +81,10 @@ class VipController extends Controller
             ? config('payment.mch.wechat_id')
             : config('payment.mch.alipay_id');
 
-        // Create payment order
+        // Create payment order with inviter_id if exists
         $paymentOrder = \App\Models\PaymentOrder::create([
             'user_id' => $user->id,
+            'inviter_id' => $user->inviter_id, // Add inviter_id from user
             'remote_order_status' => -1,
             'product_key' => $productKey,
             'product_value' => $product['value'],

@@ -88,10 +88,20 @@ class AuthController extends Controller
             RateLimiter::hit($domainKey, 3600); // 1小时内同一邮箱域名最多10次
         }
 
+        // Check if inviter_id is provided and valid
+        $inviterId = null;
+        if ($request->has('inviter_id')) {
+            $inviter = User::find($request->inviter_id);
+            if ($inviter) {
+                $inviterId = $inviter->id;
+            }
+        }
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'inviter_id' => $inviterId,
         ]);
 
         // Create token for the user (default 7 days)

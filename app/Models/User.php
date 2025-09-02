@@ -25,6 +25,7 @@ class User extends Authenticatable
         'img_server',
         'vip_expired_at',
         'is_admin',
+        'inviter_id',
     ];
 
     /**

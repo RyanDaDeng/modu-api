@@ -95,6 +95,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Redemption code - user redeem (requires auth)
     Route::post('/redemption/redeem', [RedemptionCodeController::class, 'redeem']);
+    
+    // Affiliate dashboard
+    Route::get('/affiliate/dashboard', [\App\Http\Controllers\Api\AffiliateController::class, 'dashboard']);
 });
 
 // Admin routes (requires auth and admin role)
