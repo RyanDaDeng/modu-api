@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\RedemptionCode;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,19 +24,33 @@ class RedemptionCodeController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $request->validate([
+        $data = $request->validate([
             'type' => 'required|string|in:vip',
             'value' => 'required|integer|min:1|max:365', // Days for VIP
             'reference' => 'nullable|string|max:255',
         ]);
 
+        if (isset($data['reference'])) {
+            $exists = RedemptionCode::query()
+                    ->where('reference', $data['reference'])
+                    ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
+                    ->count() >= 1;
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '30天内只能兑换最多只能创建1个兑换码'
+                ], 200);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $code = RedemptionCode::create([
-                'code' => RedemptionCode::generateCode(strtoupper($request->type)),
-                'type' => $request->type,
-                'value' => $request->value,
-                'reference' => $request->reference,
+                'code' => RedemptionCode::generateCode(strtoupper($request['type'])),
+                'type' => $data['type'],
+                'value' => $data['value'],
+                'reference' =>$data['reference'],
                 'is_active' => true,
             ]);
             DB::commit();
