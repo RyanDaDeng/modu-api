@@ -29,17 +29,17 @@ class RedemptionCodeController extends Controller
             'value' => 'required|integer|min:1|max:365', // Days for VIP
             'reference' => 'nullable|string|max:255',
         ]);
-        $exists = RedemptionCode::query()
-                ->where('redeemed_by', $data['reference'])
-                ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
-                ->count() >= 1;
-
-        if ($exists) {
-            return response()->json([
-                'success' => false,
-                'message' => '30天内只能兑换最多只能创建1个兑换码'
-            ], 200);
-        }
+//        $exists = RedemptionCode::query()
+//                ->where('redeemed_by', $data['reference'])
+//                ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
+//                ->count() >= 1;
+//
+//        if ($exists) {
+//            return response()->json([
+//                'success' => false,
+//                'message' => '30天内只能兑换最多只能创建1个兑换码'
+//            ], 200);
+//        }
 
         DB::beginTransaction();
         try {
