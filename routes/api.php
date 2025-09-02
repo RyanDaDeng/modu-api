@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BookmarkController;
 use App\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\ImageServerController;
 use App\Http\Controllers\Api\RedemptionCodeController;
+use App\Http\Controllers\Api\Admin\PaymentAnalysisController;
 
 // Authentication routes with throttling
 Route::prefix('auth')->group(function () {
@@ -94,4 +95,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Redemption code - user redeem (requires auth)
     Route::post('/redemption/redeem', [RedemptionCodeController::class, 'redeem']);
+});
+
+// Admin routes (requires auth and admin role)
+Route::middleware(['auth:sanctum', \App\Http\Middleware\IsAdmin::class])->prefix('admin')->group(function () {
+    // Payment analysis
+    Route::get('/payment-analysis', [PaymentAnalysisController::class, 'index']);
+    Route::get('/payment-analysis/{id}', [PaymentAnalysisController::class, 'show']);
 });

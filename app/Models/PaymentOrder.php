@@ -10,6 +10,7 @@ class PaymentOrder extends Model
 
     protected $fillable = [
         'user_id',
+        'mch_order_no',
         'order_reference',
         'remote_order_id',
         'remote_order_status',

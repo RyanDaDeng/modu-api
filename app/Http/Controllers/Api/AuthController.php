@@ -214,10 +214,11 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        // Add VIP status to response
+        // Add VIP status and admin status to response
         if ($user) {
             $userData = $user->toArray();
             $userData['is_vip'] = $user->hasActiveVip();
+            $userData['is_admin'] = (bool) $user->is_admin;
             return response()->json($userData);
         }
 

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'img_server',
         'vip_expired_at',
+        'is_admin',
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'vip_expired_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 
