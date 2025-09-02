@@ -39,7 +39,7 @@ class RedemptionCodeController extends Controller
             if ($exists) {
                 return response()->json([
                     'success' => false,
-                    'message' => '30天内只能兑换最多只能创建1个兑换码'
+                    'message' => '30天内只能创建1个兑换码'
                 ], 200);
             }
         }
