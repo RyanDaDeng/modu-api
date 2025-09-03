@@ -64,7 +64,13 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
-
+        'mch-payment' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/mch-payment/laravel.log'),
+            'level' => 'info',
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
