@@ -16,7 +16,7 @@ class VipController extends Controller
             [
                 'key' => 'monthly',
                 'name' => '月卡',
-                'price' => 29,
+                'price' => 39,
                 'duration' => 1,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
@@ -25,24 +25,24 @@ class VipController extends Controller
             [
                 'key' => 'quarterly',
                 'name' => '季卡',
-                'price' => 69,
-                'original_price' => 90,
+                'price' => 99,
+                'original_price' => 117,
                 'duration' => 3,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
                 'popular' => true,
-                'save_amount' => 90 - 69
+                'save_amount' => 18
             ],
             [
                 'key' => 'yearly',
                 'name' => '年卡',
-                'price' => 239,
-                'original_price' => 360,
+                'price' => 299,
+                'original_price' => 468,
                 'duration' => 12,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
                 'popular' => false,
-                'save_amount' => 360 - 239
+                'save_amount' => 169
             ]
         ];
 
@@ -81,10 +81,9 @@ class VipController extends Controller
             ? config('payment.mch.wechat_id')
             : config('payment.mch.alipay_id');
 
-        // Create payment order with inviter_id if exists
+        // Create payment order
         $paymentOrder = \App\Models\PaymentOrder::create([
             'user_id' => $user->id,
-            'inviter_id' => $user->inviter_id, // Add inviter_id from user
             'remote_order_status' => -1,
             'product_key' => $productKey,
             'product_value' => $product['value'],
@@ -105,7 +104,7 @@ class VipController extends Controller
         $res = $client->callCreate(
             $product['decimal_price'],  // Use decimal_price for payment gateway
             $paymentOrder->order_reference,
-            config('app.url') . '/webhook/receive-mch',
+            config('app.url') . '/api/webhook/receive-mch',
             $ip,
             $productId
         );
