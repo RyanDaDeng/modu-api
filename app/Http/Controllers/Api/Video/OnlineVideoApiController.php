@@ -200,12 +200,13 @@ class OnlineVideoApiController extends ApiController
             'video_id' => 'required|exists:online_videos,id'
         ]);
 
-        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at, 'UTC')->lessThan(Carbon::now('UTC'))) {
+        $user = $request->user();
+        if (empty($user->video_expired_at) || Carbon::parse($user->video_expired_at, 'UTC')->lessThan(Carbon::now('UTC'))) {
            return $this->sendErrorWithMessage('您没有视频通行证无法操作！');
         }
 
         $videoId = $request->input('video_id');
-        $userId = $request->user()->id;
+        $userId = $user->id;
 
         DB::beginTransaction();
         try {
@@ -282,7 +283,8 @@ class OnlineVideoApiController extends ApiController
         $video = OnlineVideo::findOrFail($id);
 
         // 检查用户是否是视频VIP - 统一使用 UTC 时间进行比较
-        $isVip = !empty(Auth::user()->video_expired_at) && Carbon::parse(Auth::user()->video_expired_at, 'UTC')->greaterThan(Carbon::now('UTC'));
+        $user = $request->user();
+        $isVip = $user && !empty($user->video_expired_at) && Carbon::parse($user->video_expired_at, 'UTC')->greaterThan(Carbon::now('UTC'));
 
         // 如果不是VIP，移除播放URL
         if (!$isVip) {
@@ -291,8 +293,8 @@ class OnlineVideoApiController extends ApiController
         }
 
         // 如果用户已登录，检查收藏状态
-        if ($request->user()) {
-            $video->is_favorited = VideoFavorite::where('user_id', $request->user()->id)
+        if ($user) {
+            $video->is_favorited = VideoFavorite::where('user_id', $user->id)
                 ->where('video_id', $id)
                 ->exists();
         } else {

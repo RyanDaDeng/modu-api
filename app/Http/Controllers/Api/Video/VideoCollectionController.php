@@ -28,8 +28,9 @@ class VideoCollectionController extends Controller
      */
     public function store(Request $request)
     {
-        // Check if user is video VIP
-        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at, 'UTC')->lessThan(Carbon::now())) {
+        // Check if user is video VIP - 统一使用 UTC 时间进行比较
+        $user = $request->user();
+        if (empty($user->video_expired_at) || Carbon::parse($user->video_expired_at, 'UTC')->lessThan(Carbon::now('UTC'))) {
             return response()->json([
                 'success' => false,
                 'message' => '视频收藏功能仅限会员使用，请先开通视频会员'
@@ -102,8 +103,9 @@ class VideoCollectionController extends Controller
      */
     public function toggle(Request $request)
     {
-        // Check if user is video VIP
-        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at, 'UTC')->lessThan(Carbon::now())) {
+        // Check if user is video VIP - 统一使用 UTC 时间进行比较
+        $user = $request->user();
+        if (empty($user->video_expired_at) || Carbon::parse($user->video_expired_at, 'UTC')->lessThan(Carbon::now('UTC'))) {
             return response()->json([
                 'success' => false,
                 'message' => '视频收藏功能仅限会员使用，请先开通视频会员'

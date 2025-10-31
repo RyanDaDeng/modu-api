@@ -61,7 +61,7 @@ Route::get('/comic/{id}', [\App\Http\Controllers\Api\RandomComicsController::cla
 // Online Video Routes (public - guest can view list and settings)
 Route::get('/online-video', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'get'])->name('online.video');
 Route::get('/online-video-settings', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'setting'])->name('online.video.setting');
-Route::get('/online-video/{id}/detail', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'getVideoDetail'])->name('online.video.detail');
+Route::get('/public/online-video/{id}/detail', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'getVideoDetail'])->name('online.video.detail');
 Route::get('/online-video/hot-recommendations', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'getHotRecommendations'])->name('online.video.hot');
 
 // Test decrypt endpoints (public for testing)
@@ -115,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Affiliate dashboard
     Route::get('/affiliate/dashboard', [\App\Http\Controllers\Api\AffiliateController::class, 'dashboard']);
+    Route::get('/online-video/{id}/detail', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'getVideoDetail'])->name('online.video.detail');
 
 });
 
