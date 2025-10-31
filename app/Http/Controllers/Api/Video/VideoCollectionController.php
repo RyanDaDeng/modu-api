@@ -7,6 +7,7 @@ use App\Models\VideoCollection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class VideoCollectionController extends Controller
 {
@@ -27,6 +28,14 @@ class VideoCollectionController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if user is video VIP
+        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at, 'UTC')->lessThan(Carbon::now())) {
+            return response()->json([
+                'success' => false,
+                'message' => '视频收藏功能仅限会员使用，请先开通视频会员'
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'video_id' => 'required|string',
             'name' => 'required|string|max:255',
@@ -93,6 +102,14 @@ class VideoCollectionController extends Controller
      */
     public function toggle(Request $request)
     {
+        // Check if user is video VIP
+        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at, 'UTC')->lessThan(Carbon::now())) {
+            return response()->json([
+                'success' => false,
+                'message' => '视频收藏功能仅限会员使用，请先开通视频会员'
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'video_id' => 'required|string',
             'name' => 'required|string|max:255',
