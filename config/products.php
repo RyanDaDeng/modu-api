@@ -3,7 +3,7 @@
 return [
     'products' => [
         'monthly' => [
-            'name' => 'VIP月卡',
+            'name' => '漫画VIP月卡',
             'price' => 39,
             'decimal_price' => 3900,  // price * 100 for payment gateway
             'original_price' => 39,
@@ -12,7 +12,7 @@ return [
             'days' => 30
         ],
         'quarterly' => [
-            'name' => 'VIP季卡',
+            'name' => '漫画VIP季卡',
             'price' => 99,
             'decimal_price' => 9900,  // price * 100 for payment gateway
             'original_price' => 117,
@@ -21,7 +21,7 @@ return [
             'days' => 90
         ],
         'yearly' => [
-            'name' => 'VIP年卡',
+            'name' => '漫画VIP年卡',
             'price' => 299,
             'decimal_price' => 29900,  // price * 100 for payment gateway
             'original_price' => 468,
