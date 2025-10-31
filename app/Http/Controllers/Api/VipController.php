@@ -8,13 +8,15 @@ use Illuminate\Http\Request;
 class VipController extends Controller
 {
     /**
-     * Get available VIP plans
+     * Get available VIP plans (both comic and video)
      */
     public function plans()
     {
         $plans = [
+            // Comic plans
             [
                 'key' => 'monthly',
+                'type' => 'comic',
                 'name' => '月卡',
                 'price' => 39,
                 'duration' => 1,
@@ -24,6 +26,7 @@ class VipController extends Controller
             ],
             [
                 'key' => 'quarterly',
+                'type' => 'comic',
                 'name' => '季卡',
                 'price' => 99,
                 'original_price' => 117,
@@ -35,12 +38,48 @@ class VipController extends Controller
             ],
             [
                 'key' => 'yearly',
+                'type' => 'comic',
                 'name' => '年卡',
                 'price' => 299,
                 'original_price' => 468,
                 'duration' => 12,
                 'duration_unit' => '个月',
                 'features' => ['解锁全站所有漫画'],
+                'popular' => false,
+                'save_amount' => 169
+            ],
+            // Video plans
+            [
+                'key' => 'monthly-video',
+                'type' => 'video',
+                'name' => '月卡',
+                'price' => 50,
+                'duration' => 1,
+                'duration_unit' => '个月',
+                'features' => ['解锁全站所有视频'],
+                'popular' => false
+            ],
+            [
+                'key' => 'quarterly-video',
+                'type' => 'video',
+                'name' => '季卡',
+                'price' => 99,
+                'original_price' => 117,
+                'duration' => 3,
+                'duration_unit' => '个月',
+                'features' => ['解锁全站所有视频'],
+                'popular' => true,
+                'save_amount' => 18
+            ],
+            [
+                'key' => 'yearly-video',
+                'type' => 'video',
+                'name' => '年卡',
+                'price' => 299,
+                'original_price' => 468,
+                'duration' => 12,
+                'duration_unit' => '个月',
+                'features' => ['解锁全站所有视频'],
                 'popular' => false,
                 'save_amount' => 169
             ]
@@ -58,7 +97,7 @@ class VipController extends Controller
     public function createOrder(Request $request)
     {
         $request->validate([
-            'plan_key' => 'required|in:monthly,quarterly,yearly',
+            'plan_key' => 'required|in:monthly,quarterly,yearly,monthly-video,quarterly-video,yearly-video',
             'payment_method' => 'required|in:alipay,wechat'
         ]);
 

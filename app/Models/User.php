@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'img_server',
         'vip_expired_at',
+        'video_expired_at',
         'is_admin',
         'inviter_id',
     ];
@@ -48,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'vip_expired_at' => 'datetime',
+            'video_expired_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
@@ -59,6 +61,14 @@ class User extends Authenticatable
     public function collections()
     {
         return $this->hasMany(Collection::class);
+    }
+
+    /**
+     * Get the user's video collections.
+     */
+    public function videoCollections()
+    {
+        return $this->hasMany(VideoCollection::class);
     }
 
     /**
@@ -103,9 +113,41 @@ class User extends Authenticatable
             // If user doesn't have VIP or it's expired, start from now
             $this->vip_expired_at = now()->addDays($days);
         }
-        
+
         $this->save();
-        
+
         return $this->vip_expired_at;
+    }
+
+    /**
+     * Check if user has active video VIP status
+     */
+    public function hasActiveVideoVip()
+    {
+        // If video_expired_at is null, user is not video VIP
+        if (!$this->video_expired_at) {
+            return false;
+        }
+
+        // Check if video VIP hasn't expired
+        return now()->lt($this->video_expired_at);
+    }
+
+    /**
+     * Add video VIP days to the user
+     */
+    public function addVideoVipDays($days)
+    {
+        if ($this->hasActiveVideoVip()) {
+            // If user already has video VIP, extend from current expiry
+            $this->video_expired_at = $this->video_expired_at->addDays($days);
+        } else {
+            // If user doesn't have video VIP or it's expired, start from now
+            $this->video_expired_at = now()->addDays($days);
+        }
+
+        $this->save();
+
+        return $this->video_expired_at;
     }
 }

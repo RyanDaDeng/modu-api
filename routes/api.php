@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\ImageServerController;
 use App\Http\Controllers\Api\RedemptionCodeController;
 use App\Http\Controllers\Api\Admin\PaymentAnalysisController;
+use App\Http\Controllers\Api\Video\VideoCollectionController;
 
 // Authentication routes with throttling
 Route::prefix('auth')->group(function () {
@@ -55,6 +56,12 @@ Route::get('/catalog/categories', [\App\Http\Controllers\Api\CatalogController::
 Route::get('/random-comics', [\App\Http\Controllers\Api\RandomComicsController::class, 'getRandomComics']);
 Route::get('/comic/{id}', [\App\Http\Controllers\Api\RandomComicsController::class, 'getComicDetail']);
 
+
+
+// Online Video Routes (public - guest can view list and settings)
+Route::get('/online-video', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'get'])->name('online.video');
+Route::get('/online-video-settings', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'setting'])->name('online.video.setting');
+
 // Test decrypt endpoints (public for testing)
 Route::prefix('test')->group(function () {
     Route::get('/decrypt/catalog', [\App\Http\Controllers\Api\TestDecryptController::class, 'testCatalog']);
@@ -82,6 +89,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/collections/{comicId}', [CollectionController::class, 'destroy']);
     Route::get('/collections/stats', [CollectionController::class, 'stats']);
 
+    // Video Collection routes
+    Route::get('/video-collections', [VideoCollectionController::class, 'index']);
+    Route::post('/video-collections', [VideoCollectionController::class, 'store']);
+    Route::post('/video-collections/toggle', [VideoCollectionController::class, 'toggle']);
+    Route::get('/video-collections/check/{videoId}', [VideoCollectionController::class, 'check']);
+    Route::delete('/video-collections/{videoId}', [VideoCollectionController::class, 'destroy']);
+    Route::get('/video-collections/stats', [VideoCollectionController::class, 'stats']);
+
     // Bookmark routes
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/bookmarks', [BookmarkController::class, 'store']);
@@ -95,9 +110,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Redemption code - user redeem (requires auth)
     Route::post('/redemption/redeem', [RedemptionCodeController::class, 'redeem']);
-    
+
     // Affiliate dashboard
     Route::get('/affiliate/dashboard', [\App\Http\Controllers\Api\AffiliateController::class, 'dashboard']);
+
+    // Video detail and recommendations (requires auth)
+    Route::get('/online-video/{id}/detail', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'getVideoDetail'])->name('online.video.detail');
+    Route::get('/online-video/hot-recommendations', [\App\Http\Controllers\Api\Video\OnlineVideoApiController::class, 'getHotRecommendations'])->name('online.video.hot');
 });
 
 // Admin routes (requires auth and admin role)

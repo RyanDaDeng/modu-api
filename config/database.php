@@ -61,7 +61,25 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-
+        'video' => [
+            'driver' => 'mysql',
+            'url' => env('VIDEO_DATABASE_URL'),
+            'host' => env('VIDEO_DB_HOST', '127.0.0.1'),
+            'port' => env('VIDEO_DB_PORT', '3306'),
+            'database' => env('VIDEO_DB_DATABASE', 'forge'),
+            'username' => env('VIDEO_DB_USERNAME', 'forge'),
+            'password' => env('VIDEO_DB_PASSWORD', ''),
+            'unix_socket' => env('VIDEO_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_general_ci',
+            'prefix' => 'laravel_',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

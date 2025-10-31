@@ -90,9 +90,35 @@ class MchPaymentWebhookWebController extends Controller
                         $order->is_finished = 1;
                         $order->save();
 
-                        $additionalMessage = '用户: ' . $user->username . ' 用户ID: ' . $user->id . ' VIP到期: ' . $newExpiration->format('Y-m-d H:i:s');
+                        $additionalMessage = '用户: ' . $user->username . ' 用户ID: ' . $user->id . ' 漫画VIP到期: ' . $newExpiration->format('Y-m-d H:i:s');
                         $log->info('VIP activated: ' . $additionalMessage);
                     }
+
+
+                    if ($productDetails['type'] === 'video-vip') {
+                        // Calculate VIP expiration date
+                        $days = $productDetails['days'] ?? 30;
+                        $currentVipExpired = $user->video_expired_at ? Carbon::parse($user->video_expired_at) : null;
+
+                        // If user already has VIP and it hasn't expired, extend from current expiration
+                        // Otherwise, start from now
+                        if ($currentVipExpired && $currentVipExpired->isFuture()) {
+                            $newExpiration = $currentVipExpired->addDays($days);
+                        } else {
+                            $newExpiration = Carbon::now()->addDays($days);
+                        }
+
+                        // Update user VIP status
+                        $user->video_expired_at = $newExpiration;
+                        $user->save();
+
+                        $order->is_finished = 1;
+                        $order->save();
+
+                        $additionalMessage = '用户: ' . $user->username . ' 用户ID: ' . $user->id . ' 视频VIP到期: ' . $newExpiration->format('Y-m-d H:i:s');
+                        $log->info('VIP activated: ' . $additionalMessage);
+                    }
+
 
                     DB::commit();
                 } catch (\Exception $exception) {

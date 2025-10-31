@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Video CDN Domain
+    |--------------------------------------------------------------------------
+    |
+    | This value is the CDN domain for video cover images and assets.
+    |
+    */
+
+    'video_cdn_domain' => env('VIDEO_CDN_DOMAIN', 'https://cdn2.moxing.rest/'),
+
 ];
