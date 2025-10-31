@@ -14,7 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-
+    'search'=> env('SEARCH_ENABLED', true),
     /*
     |--------------------------------------------------------------------------
     | Application Environment
