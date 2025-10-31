@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Meilisearch\Client;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton('meilisearch', function ($app) {
+            return new Client(
+                config('scout.meilisearch.host'),
+                config('scout.meilisearch.key')
+            );
+        });
     }
 
     /**
