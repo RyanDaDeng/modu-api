@@ -200,7 +200,7 @@ class OnlineVideoApiController extends ApiController
             'video_id' => 'required|exists:online_videos,id'
         ]);
 
-        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at,'UTC')->lessThan(Carbon::now())) {
+        if (empty(Auth::user()->video_expired_at) || Carbon::parse(Auth::user()->video_expired_at, 'UTC')->lessThan(Carbon::now('UTC'))) {
            return $this->sendErrorWithMessage('您没有视频通行证无法操作！');
         }
 
@@ -281,8 +281,8 @@ class OnlineVideoApiController extends ApiController
     {
         $video = OnlineVideo::findOrFail($id);
 
-        // 检查用户是否是视频VIP
-        $isVip = !empty(Auth::user()->video_expired_at) && Carbon::parse(Auth::user()->video_expired_at, 'UTC')->greaterThan(Carbon::now());
+        // 检查用户是否是视频VIP - 统一使用 UTC 时间进行比较
+        $isVip = !empty(Auth::user()->video_expired_at) && Carbon::parse(Auth::user()->video_expired_at, 'UTC')->greaterThan(Carbon::now('UTC'));
 
         // 如果不是VIP，移除播放URL
         if (!$isVip) {
